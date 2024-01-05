@@ -28,6 +28,7 @@ export const filteredBills = (data, status) => {
 }
 
 export const card = (bill) => {
+  console.log("bill in card", bill)
   const firstAndLastNames = bill.email.split('@')[0]
   const firstName = firstAndLastNames.includes('.') ?
     firstAndLastNames.split('.')[0] : ''
@@ -144,8 +145,9 @@ export default class {
         .html("")
       this.counter ++
     }
-
+    
     bills.forEach(bill => {
+      $(`#open-bill${bill.id}`).off('click')
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })
 
