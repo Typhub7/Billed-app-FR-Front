@@ -4,12 +4,13 @@ import LoadingPage from "./LoadingPage.js"
 
 import Actions from './Actions.js'
 
+// le problème d'affichage 22 nov 2021 vient surement du bill.date
 const row = (bill) => {
   return (`
     <tr>
       <td>${bill.type}</td>
       <td>${bill.name}</td>
-      <td>${bill.date}</td>
+      <td>${bill.date}</td> 
       <td>${bill.amount} €</td>
       <td>${bill.status}</td>
       <td>
@@ -19,10 +20,21 @@ const row = (bill) => {
     `)
   }
 
+// le map de chaque ligne du tableau se fait ici, donc voir ici pour le problème d'ordre d'affichage ( placer le .sort ici ?)
 const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+  return (data && data.length)
+   ? data
+   .sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateB - dateA;
+    })
+   .map(bill => row(bill))
+   .join("") 
+   : ""
 }
 
+// Gestion de l'affichage modale du justificatif
 export default ({ data: bills, loading, error }) => {
   
   const modal = () => (`
