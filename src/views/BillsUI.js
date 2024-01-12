@@ -4,13 +4,15 @@ import LoadingPage from "./LoadingPage.js"
 
 import Actions from './Actions.js'
 
-// le problème d'affichage 22 nov 2021 vient surement du bill.date
 const row = (bill) => {
+  // Les dates étant formaté dans get qui n'est pas utilisé dans les données mockées.
+  // Permet de faire passer le test dans le cas des données mockées.
+  const rawDate = bill.formatedDate ?? bill.date
   return (`
     <tr>
       <td>${bill.type}</td>
       <td>${bill.name}</td>
-      <td>${bill.date}</td> 
+      <td>${rawDate}</td> 
       <td>${bill.amount} €</td>
       <td>${bill.status}</td>
       <td>
@@ -20,19 +22,22 @@ const row = (bill) => {
     `)
   }
 
-// le map de chaque ligne du tableau se fait ici, donc voir ici pour le problème d'ordre d'affichage ( placer le .sort ici ?)
+// le map de chaque ligne du tableau se fait ici, donc j'ai placé le .sort ici
 const rows = (data) => {
-  return (data && data.length)
-   ? data
-   .sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return dateB - dateA;
-    })
-   .map(bill => row(bill))
-   .join("") 
-   : ""
+  const bill = (data && data.length) ? data
+  .sort((a, b) => {
+   const dateA = new Date(a.date)
+   const dateB = new Date(b.date)
+   return dateB - dateA;
+   })
+  .map(bill => row(bill))
+  .join("") 
+  : ""
+  console.log("data de bill",bill)
+  return bill
+    
 }
+
 
 // Gestion de l'affichage modale du justificatif
 export default ({ data: bills, loading, error }) => {
