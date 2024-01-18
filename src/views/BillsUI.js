@@ -33,7 +33,6 @@ const rows = (data) => {
   .map(bill => row(bill))
   .join("") 
   : ""
-  console.log("data de bill",bill)
   return bill
     
 }
