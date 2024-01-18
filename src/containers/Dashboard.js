@@ -28,7 +28,6 @@ export const filteredBills = (data, status) => {
 }
 
 export const card = (bill) => {
-  console.log("bill in card", bill)
   const firstAndLastNames = bill.email.split('@')[0]
   const firstName = firstAndLastNames.includes('.') ?
     firstAndLastNames.split('.')[0] : ''
