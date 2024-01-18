@@ -33,6 +33,7 @@ const rows = (data) => {
   .map(bill => row(bill))
   .join("") 
   : ""
+
   return bill
     
 }
