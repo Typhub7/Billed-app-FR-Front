@@ -12,6 +12,7 @@ import store from "../__mocks__/store.js"
 
 import router from "../app/Router.js"
 
+
 // Simule un environnement local pour le test
 const initializeTestEnvironment = async => {
   Object.defineProperty(window, 'localStorage', { value: localStorageMock })
@@ -79,7 +80,7 @@ describe("Given I am connected as an employee", () => {
         jest.clearAllMocks()
       })
 
-      //Test 5 : The file have an non allowed extension
+      //Test 5 : Apparition d'un message pop-up si l'extension est non valide
       test("Then the file have an not allowed extension, it should have a pop up message", () => {
         window.onNavigate(ROUTES_PATH.NewBill)
         document.body.innerHTML = NewBillUI()
@@ -108,7 +109,7 @@ describe("Given I am connected as an employee", () => {
       })
       
       
-      //Test 6 : The file have an  allowed extension jpg, png or jpeg
+      //Test 6 : il n'y a pas de message pop-up si l'extension est valide
       test("Then the file have an allowed extension, it should not have a pop up message", () => {
         window.onNavigate(ROUTES_PATH.NewBill)
         document.body.innerHTML = NewBillUI()
@@ -136,7 +137,7 @@ describe("Given I am connected as an employee", () => {
         expect(linkedFile.files[0].name).toBe("file.jpg")
       })  
     })
-
+    
     describe("All the field are correctly filled and the user click on submit button", () => {
       beforeEach(() => {
         document.body.innerHTML = ""
@@ -146,7 +147,7 @@ describe("Given I am connected as an employee", () => {
         jest.clearAllMocks();
       })
 
-      //Test 7 : The file have an non allowed extension
+      //Test 7 : La validation du formulaire se passe correctement
       test("Then the submit might call the handsubmit function", () => {
         window.onNavigate(ROUTES_PATH.NewBill)
         document.body.innerHTML = NewBillUI()

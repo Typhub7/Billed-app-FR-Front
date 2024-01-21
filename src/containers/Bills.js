@@ -15,11 +15,13 @@ export default class {
     })
     new Logout({ document, localStorage, onNavigate })
   }
-
+  // Permet de naviguer vers la page de création de nouvelle note de frais lorsqu'on clique sur le bouton correspondant.
   handleClickNewBill = () => {
     this.onNavigate(ROUTES_PATH['NewBill'])
   }
 
+  // Gère l'affichage d'une modale avec la preuve de la facture associée à l'icône "eye" cliquée, 
+  // en redimensionnant l'image pour s'adapter à la modale.
   handleClickIconEye = (icon) => {
     const billUrl = icon.getAttribute("data-bill-url")
     const imgWidth = Math.floor($('#modaleFile').width() * 0.5)
@@ -27,6 +29,9 @@ export default class {
     $('#modaleFile').modal('show')
   }
 
+  // Utilise la méthode list du store pour récupérer la liste des factures, formate les données, 
+  // Renvoie une Promise avec les factures formatées. 
+  // Gère  les erreurs de formatage des dates en les loggant et renvoyant les dates non formatées en cas d'échec.
   getBills = () => {
     if (this.store) {
       return this.store
@@ -46,7 +51,7 @@ export default class {
             } catch(e) {
               // if for some reason, corrupted data was introduced, we manage here failing formatDate function
               // log the error and return unformatted date in that case
-              console.log(e,'for',doc)
+              // console.log(e,'for',doc)
               return {
                 ...doc,
                 date: doc.date, 

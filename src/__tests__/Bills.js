@@ -12,8 +12,10 @@ import {localStorageMock} from "../__mocks__/localStorage.js"
 import router from "../app/Router.js"
 import store from "../__mocks__/store"
 
+
 // Simule un environnement local pour le test
-//une entrée 'user' est ajoutée à localStorage avec conversion en chaine de caractère, Cet objet représente un utilisateur de type 'Employee'.
+// une entrée 'user' est ajoutée à localStorage avec conversion en chaine de caractère, 
+// cet objet représente un utilisateur de type 'Employee'.
 const initializeTestEnvironment = async => {
   Object.defineProperty(window, 'localStorage', { value: localStorageMock })
   window.localStorage.setItem('user', JSON.stringify({
@@ -28,7 +30,8 @@ const initializeTestEnvironment = async => {
 }
 
 describe("Given I am a user connected as Employee", () => {
-	describe("When I navigate to BillUI", () => {
+	
+  describe("When I navigate to BillUI", () => {
     beforeEach(() => {
       initializeTestEnvironment()
     })
@@ -37,9 +40,26 @@ describe("Given I am a user connected as Employee", () => {
       jest.clearAllMocks()
     })
 
-    // Test 1 : Données / Verification de la récupération des factures via une api fictive   
-    test("Then fetches bills from mock API GET", async () => {
-      const getSpyOn = jest.spyOn(store, "bills");
+    // Test 1 : Affichage / Icone verticale 
+    test("Then bill icon in vertical layout should be highlighted", async () => {
+      window.onNavigate(ROUTES_PATH.Bills)
+
+      await waitFor(() => screen.getByTestId('icon-window'))
+      const windowIcon = screen.getByTestId('icon-window')
+
+      expect(windowIcon).toHaveClass('active-icon')
+    })
+
+    // Test 2 : Affichage / La page de chargement devrait être rendue 
+    test('Then, Loading page should be rendered', () => {
+      document.body.innerHTML = BillsUI({ loading: true });
+  
+      expect(screen.getAllByText('Loading...')).toBeTruthy();
+    })
+    
+    // Test 3 : Données (GET) / Verification de la récupération des factures via une api fictive   
+    test("Then fetches successfully bills from mock API GET", async () => {
+      const getSpyOn = jest.spyOn(store, "bills")
 
       const bills = await store.bills().list()
 
@@ -47,7 +67,7 @@ describe("Given I am a user connected as Employee", () => {
       expect(bills.length).toBe(4)
     })
 
-    // Test 2 : Données / Verification du comportement en cas d'erreur 404 
+    // Test 4 : Données / Verification du comportement en cas d'erreur 404 
     test("Then fetches bills failed and we might have a 404 message error", async () => {
       store.bills.mockRejectedValueOnce(new Error("Erreur 404"))
 
@@ -57,33 +77,43 @@ describe("Given I am a user connected as Employee", () => {
       expect(message).toBeTruthy()
     })
 
-    // Test 3 : Données / Verification du comportement en cas d'erreur 404 
+    // Test 5 : Données / Verification du comportement en cas d'erreur 404 
     test("Then fetches bills failed and we might have a 500 message error", async () => {
       store.bills.mockRejectedValueOnce(new Error("Erreur 500"))
 
       document.body.innerHTML = BillsUI({ error: "Erreur 500" })
       const message = await screen.getByText(/Erreur 500/)
 
-
       expect(message).toBeTruthy();
     })
-  })
+    
+    // Test 6 : Données : Verification de la gestion des erreurs de la methode list 
+    // lors de la récuptération de la liste des factures
+    test("Then fetches bills failed ", async () => {
+      const mockCorrupted = new Error('Error in method list')
 
-  describe("When I am on Bills Page", () => {
+      const mockStoreCorrupted = {
+        bills: jest.fn(() => ({
+          list : jest.fn(() => Promise.reject(mockCorrupted)),
+        })),
+      }
 
-    // Test 4 : Affichage / Icone verticale 
-    test("Then bill icon in vertical layout should be highlighted", async () => {
+      const bill = new Bills({
+        document,
+        onNavigate,
+        store : mockStoreCorrupted,
+        localStorage: window.localStorage,
+      })
 
-      window.onNavigate(ROUTES_PATH.Bills)
-
-      await waitFor(() => screen.getByTestId('icon-window'))
-      const windowIcon = screen.getByTestId('icon-window')
-
-      expect(windowIcon).toHaveClass('active-icon')
-
+      try {
+        await bill.getBills()
+      } catch (error) {
+        expect(error).toBe(mockCorrupted)
+      }   
     })
-
-    // Test 5 : Affichage / Présence du titre et du bouton Nouvelle Note de frais
+  
+  
+    // Test 7 : Affichage / Présence du titre et du bouton Nouvelle Note de frais
     test("Then, The page got a title 'Mes notes de frais' and there is a button 'Nouvelle Note de frais'", () => {
       document.body.innerHTML = BillsUI({ data: [] })
 
@@ -91,7 +121,7 @@ describe("Given I am a user connected as Employee", () => {
       expect(screen.getByTestId("btn-new-bill")).toBeTruthy()
     })
 
-    // Test 6 : Affichage / Ordre d'affichage des factures avec tri du plus recent au plus ancien
+    // Test 8 : Affichage / Ordre d'affichage des factures avec tri du plus recent au plus ancien
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills })
       const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
@@ -100,7 +130,7 @@ describe("Given I am a user connected as Employee", () => {
       expect(dates).toEqual(datesSorted)
     })
 
-    // Test 7 : Affichage / Si aucune facture dans la base, aucun affichage de facture
+    // Test 9 : Affichage / Si aucune facture dans la base, aucun affichage de facture
     test("Then if the data contain no bills, no bills might be displayed", () => {
       document.body.innerHTML = BillsUI({ data: [] })
 			const bill = screen.queryByTestId("bill")
@@ -108,7 +138,7 @@ describe("Given I am a user connected as Employee", () => {
     })
 
   
-    // Test 8 : Interaction / Si on clique sur l'oeil cela ouvre une modale
+    // Test 10 : Interaction / Si on clique sur l'oeil cela ouvre une modale
     test("Then when clicking on the eyes icon of a bill might open a modal", () => {
 
       document.body.innerHTML = BillsUI({ data: bills })
@@ -140,7 +170,7 @@ describe("Given I am a user connected as Employee", () => {
       expect(screen.getByText("Justificatif")).toBeInTheDocument()  
       })
 
-    // Test 9 : Interaction / Le bouton Nouvelle note de frais navigue vers la page Newbill
+    // Test 11 : Données (POST) / Le bouton Nouvelle note de frais navigue vers la page Newbill
     test("Then clicking on the 'Nouvelle note de frais' button should navigate to NewBill", async () => {
       const newBillButton = screen.getByTestId('btn-new-bill')
       const onNavigate = jest.fn(() => window.onNavigate(ROUTES_PATH.NewBill))
