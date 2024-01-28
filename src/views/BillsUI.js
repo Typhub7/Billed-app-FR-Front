@@ -8,6 +8,9 @@ const row = (bill) => {
   // Les dates étant formaté dans get qui n'est pas utilisé dans les données mockées.
   // Permet de faire passer le test dans le cas des données mockées.
   const rawDate = bill.formatedDate ?? bill.date
+  console.log("bill Formated Date",bill.formatedDate)
+  console.log("bill.date",bill.date)
+
   return (`
     <tr>
       <td>${bill.type}</td>
